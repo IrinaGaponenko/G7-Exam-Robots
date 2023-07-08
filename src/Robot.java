@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Robot {
     private String name;
@@ -17,44 +18,51 @@ public class Robot {
         assignRandomButtons();
     }
 
-    private char getRandomKey() {
-        int randIdx = new Random().nextInt(actionButtons.length());
-        char randChar = actionButtons.charAt(randIdx);
-        actionButtons = actionButtons.replace(String.valueOf(randChar), "");
-        return randChar;
-    }
     private void assignRandomButtons() {
-        List<Character> buttonList = new ArrayList<>();
+        List<Character> buttonList = new ArrayList<>(actionButtons.length());
         for (char c : actionButtons.toCharArray()) {
             buttonList.add(c);
         }
-        Collections.shuffle(buttonList);
-        for (int i = 0; i < 5; i++) {
-            char button = buttonList.get(i);
+
+        activeButtons.clear();
+        Random random = new Random();
+        int count = 0;
+        while (count < 5 && !buttonList.isEmpty()) {
+            int randomIndex = random.nextInt(buttonList.size());
+            char button = buttonList.remove(randomIndex);
             activeButtons.add(button);
+            count++;
         }
     }
+
     public String getName() {
         return name;
     }
+
     public int getHealth() {
         return health;
     }
+
     public Set<Character> getActiveButtons() {
         return activeButtons;
     }
+
     public String getActionButtons() {
         return actionButtons;
     }
+
     public boolean isButtonUsed(String button) {
         return usedButtons.contains(button);
     }
+
     public void markButtonAsUssed(String button) {
         usedButtons.add(button);
     }
+
     public void reduceHealth(int damage) {
         health -= damage;
     }
+
     public String getExit() {
         return exitGame;
     }

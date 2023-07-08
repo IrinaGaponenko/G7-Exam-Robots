@@ -31,9 +31,10 @@ public class GamePlay {
 
     private void performTurn(Robot currentRobot, Robot opponentRobot) {
         System.out.println(
-                String.format("Action buttons for %s are %s", currentRobot.getName(), currentRobot.getActionButtons()));
+                String.format("Action buttons for %s: %s", currentRobot.getName(), currentRobot.getActionButtons()));
         System.out.println(
-                String.format("%s, press a button (or press %s to end the game):", currentRobot.getName(), currentRobot.getExit())); //треба знайти як виводити список екшн баттонс
+                String.format("%s, please, press an action button (or press %s to end the game):", currentRobot.getName(), currentRobot.getExit())); //треба знайти як виводити список екшн баттонс
+
         String input = scanner.nextLine();
 
         if (input.equalsIgnoreCase(currentRobot.getExit())) {
@@ -41,37 +42,43 @@ public class GamePlay {
             System.exit(0);
         }
 
+        if (input.isEmpty()) {
+            System.out.println("Can't be empty!");
+            performTurn(currentRobot, opponentRobot);
+            return;
+        }
+
+
         if (input.length() != 1) {
             input = input.substring(0, 1);
         }
 
         String button = input.toUpperCase();
-        String actionButtons = currentRobot.getActionButtons();
 
         if (!Character.isLetter(button.charAt(0))) {
             System.out.println(
-                    String.format("Invalid button. Press a letter button from the list %s", actionButtons));
+                    String.format("Invalid button."));
             performTurn(currentRobot, opponentRobot);
             return;
         }
 
-        if (!actionButtons.contains(button)) {
+        if (!currentRobot.getActionButtons().contains(button)) {
             System.out.println(
-                    String.format("Invalid button. Press a button from the list %s", actionButtons));
+                    String.format("Invalid button."));
             performTurn(currentRobot, opponentRobot);
             return;
         }
 
         if (currentRobot.isButtonUsed(button)) {
             System.out.println(
-                    String.format("Button is already used. Press another button from the list: %s", actionButtons));
+                    String.format("Button is already used."));
             performTurn(currentRobot, opponentRobot); // Retry the turn for the same robot
             return;
         }
 
         currentRobot.markButtonAsUssed(button);
 
-        if (currentRobot.getActiveButtons().contains(button.charAt(0))) {
+        if (opponentRobot.getActiveButtons().contains(button.charAt(0))) {
             opponentRobot.reduceHealth(20);
             opponentRobot.getActiveButtons().remove(button.charAt(0));
         }
@@ -79,30 +86,28 @@ public class GamePlay {
 
     public void play() {
         while (true) {
-
             performTurn(robot1, robot2);
-
-            if (robot2.getHealth() <= 0) {
-                System.out.println(
-                        String.format("%s wins!", robot1.getName()));
-                break;
-            }
-
             performTurn(robot2, robot1);
 
-            if (robot1.getHealth() <= 0) {
-                System.out.println(
-                        String.format("%s wins!", robot2.getName()));
+            if (robot1.getHealth() <= 0 && robot2.getHealth() <= 0) {
+                System.out.println("Game over. It's a tie!");
+                break;
+            } else if (robot1.getHealth() <= 0) {
+                System.out.println(String.format("%s wins!", robot2.getName()));
+                break;
+            } else if (robot2.getHealth() <= 0) {
+                System.out.println(String.format("%s wins!", robot1.getName()));
                 break;
             }
 
-            System.out.println(
-                    String.format("%s: Health is %s ", robot1.getName(), robot1.getHealth()));
-            System.out.println(
-                    String.format("%s: Health is %s ", robot2.getName(), robot2.getHealth()));
+            System.out.println(String.format("%s: Health is %s", robot1.getName(), robot1.getHealth()));
+            System.out.println(String.format("%s: Health is %s", robot2.getName(), robot2.getHealth()));
         }
 
         System.out.println("Game over.");
     }
+
+
+
 }
 
